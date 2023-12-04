@@ -36,15 +36,15 @@ def index():
         }
     }), 200
 
-@app.route('/marine/predict', methods=['POST'])
-@auth.login_required()
-def predict_marine_classification():
-    return marine(app, allowed_file, model_marine_classification, model_marine_grading)
+# @app.route('/marine/predict', methods=['POST'])
+# @auth.login_required()
+# def predict_marine_classification():
+#     return marine(app, allowed_file, model_marine_classification, model_marine_grading)
 
-@app.route('/price/predict', methods=['POST'])
-@auth.login_required()
-def predict_marine_price_prediction():
-    return marine_price_prediction(model_marine_price_prediction)
+# @app.route('/price/predict', methods=['POST'])
+# @auth.login_required()
+# def predict_marine_price_prediction():
+#     return marine_price_prediction(model_marine_price_prediction)
 
 # @app.route('/sail_decision/predict', methods=['POST'])
 # @auth.login_required()
