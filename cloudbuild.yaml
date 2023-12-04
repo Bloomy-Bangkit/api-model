@@ -19,6 +19,8 @@ steps:
       - '2'
       - '--memory'
       - '2048Mi'
+      - '--port'
+      - '8080'
       - '--allow-unauthenticated'
 images:
   - 'gcr.io/$PROJECT_ID/bloomy-model:$COMMIT_SHA'
