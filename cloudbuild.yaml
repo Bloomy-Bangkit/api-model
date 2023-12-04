@@ -1,0 +1,25 @@
+steps:
+  - name: "gcr.io/cloud-builders/gsutil"
+    args: ["cp", "-r", "gs://bangkitcapstone-bloomy-bucket/models", "models/"]
+  - name: gcr.io/cloud-builders/docker
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/bloomy-model:$COMMIT_SHA', '.']
+  - name: gcr.io/cloud-builders/docker
+    args: ['push', 'gcr.io/$PROJECT_ID/bloomy-model:$COMMIT_SHA']
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk
+    entrypoint: gcloud
+    args:
+      - run
+      - deploy
+      - 'api-fishgrading'
+      - '--image'
+      - 'gcr.io/$PROJECT_ID/bloomy-model:$COMMIT_SHA'
+      - '--region'
+      - 'us-central1'
+      - '--cpu'
+      - '2'
+      - '--memory'
+      - '2048Mi'
+      - '--allow-unauthenticated'
+images:
+  - 'gcr.io/$PROJECT_ID/bloomy-model:$COMMIT_SHA'
+logsBucket: 'gs://bangkitcapstone-bloomy-bucket/logs'
