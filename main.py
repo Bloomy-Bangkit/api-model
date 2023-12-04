@@ -4,10 +4,6 @@ from PIL import Image
 from flask import Flask, jsonify
 from dotenv import load_dotenv
 from tensorflow.keras.models import load_model
-from auth import auth
-from marine import marine
-from marine_price_prediction import marine_price_prediction
-# from marine_sail_decision import marine_sail_decision
 
 load_dotenv()
 app = Flask(__name__)
