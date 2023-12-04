@@ -10,7 +10,7 @@ steps:
     args:
       - run
       - deploy
-      - 'api-fishgrading'
+      - 'api-model'
       - '--image'
       - 'gcr.io/$PROJECT_ID/bloomy-model:$COMMIT_SHA'
       - '--region'
