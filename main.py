@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 from PIL import Image
 from flask import Flask, jsonify, request
-from google.cloud import storage
+# from google.cloud import storage
 from dotenv import load_dotenv
 from werkzeug.utils import secure_filename
 from tensorflow.keras.models import load_model
@@ -22,7 +22,7 @@ app.config['MODEL_MARINE_SAIL_DECISION'] = 'models/marine_sail_decision.h5'
 app.config['MODEL_MARINE_PRICE'] = 'models/marine_price.h5'
 app.config['MODEL_MARINE_PRICE_SCALER'] = 'models/price_scaler.pkl'
 app.config['MODEL_MARINE_ACTUAL_PRICE_SCALER'] = 'models/actual_price_scaler.pkl'
-app.config["GOOGLE_APPLICATION_CREDENTIALS"] = './credentials/bangkitcapstone-bloomy-53eae279350a.json'
+# app.config["GOOGLE_APPLICATION_CREDENTIALS"] = './credentials/bangkitcapstone-bloomy-53eae279350a.json'
 
 model_marine_classification = load_model(app.config['MODEL_MARINE_CLASSIFICATION'], compile=False)
 model_marine_grading = load_model(app.config['MODEL_MARINE_GRADING'], compile=False)
@@ -31,9 +31,9 @@ model_marine_price = load_model(app.config['MODEL_MARINE_PRICE'], compile=False)
 model_marine_price_scaler = joblib.load(app.config['MODEL_MARINE_PRICE_SCALER'])
 model_marine_actual_price_scaler = joblib.load(app.config['MODEL_MARINE_ACTUAL_PRICE_SCALER'])
 
-bucket_name = 'bangkitcapstone-bloomy-bucket'
-client = storage.Client.from_service_account_json(json_credentials_path=app.config["GOOGLE_APPLICATION_CREDENTIALS"])
-bucket = storage.Bucket(client, bucket_name)
+# bucket_name = 'bangkitcapstone-bloomy-bucket'
+# client = storage.Client.from_service_account_json(json_credentials_path=app.config["GOOGLE_APPLICATION_CREDENTIALS"])
+# bucket = storage.Bucket(client, bucket_name)
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -68,7 +68,7 @@ def predict_marine_classification():
             classes = model_marine_grading.predict(x, batch_size=1)
             class_list = ['A', 'B', 'C']
             predicted_class = class_list[np.argmax(classes[0])]
-            image_name = image_path.split('/')[-1]
+            # image_name = image_path.split('/')[-1]
             # blob = bucket.blob('marine-images/' + image_name)
             # blob.upload_from_filename(image_path)
             os.remove(image_path)
