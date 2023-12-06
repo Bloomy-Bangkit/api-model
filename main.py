@@ -69,8 +69,8 @@ def predict_marine_classification():
             class_list = ['A', 'B', 'C']
             predicted_class = class_list[np.argmax(classes[0])]
             image_name = image_path.split('/')[-1]
-            blob = bucket.blob('marine-images/' + image_name)
-            blob.upload_from_filename(image_path)
+            # blob = bucket.blob('marine-images/' + image_name)
+            # blob.upload_from_filename(image_path)
             os.remove(image_path)
             return jsonify({
                 'status': {
