@@ -17,19 +17,25 @@ app.config['ALLOWED_EXTENSIONS'] = set(['png', 'jpg', 'jpeg'])
 app.config['UPLOAD_FOLDER'] = 'static/uploads/'
 
 app.config['MODEL_MARINE_CLASSIFICATION'] = 'models/marine_classification.h5'
-app.config['MODEL_MARINE_GRADING'] = 'models/marine_grading.h5'
-app.config['MODEL_MARINE_SAIL_DECISION'] = 'models/marine_sail_decision.h5'
+app.config['MODEL_MARINE_GRADING_FISH'] = 'models/marine_grading_fish.h5'
+app.config['MODEL_MARINE_GRADING_SHRIMP'] = 'models/marine_grading_shrimp.h5'
+
 app.config['MODEL_MARINE_PRICE'] = 'models/marine_price.h5'
-app.config['MODEL_MARINE_PRICE_SCALER'] = 'models/price_scaler.pkl'
-app.config['MODEL_MARINE_ACTUAL_PRICE_SCALER'] = 'models/actual_price_scaler.pkl'
+app.config['MODEL_MARINE_SAIL_DECISION'] = 'models/marine_sail_decision.h5'
+
+app.config['MODEL_MARINE_SCALER_PRICE'] = 'models/scaler_price.pkl'
+app.config['MODEL_MARINE_SCALER_ACTUAL_PRICE'] = 'models/scaler_actual_price.pkl'
 app.config["GOOGLE_APPLICATION_CREDENTIALS"] = './credentials/bangkitcapstone-bloomy-53eae279350a.json'
 
 model_marine_classification = load_model(app.config['MODEL_MARINE_CLASSIFICATION'], compile=False)
-model_marine_grading = load_model(app.config['MODEL_MARINE_GRADING'], compile=False)
-model_marine_sail_decision = load_model(app.config['MODEL_MARINE_SAIL_DECISION'], compile=False)
+model_marine_grading_fish = load_model(app.config['MODEL_MARINE_GRADING_FISH'], compile=False)
+model_marine_grading_shrimp = load_model(app.config['MODEL_MARINE_GRADING_SHRIMP'], compile=False)
+
 model_marine_price = load_model(app.config['MODEL_MARINE_PRICE'], compile=False)
-model_marine_price_scaler = joblib.load(app.config['MODEL_MARINE_PRICE_SCALER'])
-model_marine_actual_price_scaler = joblib.load(app.config['MODEL_MARINE_ACTUAL_PRICE_SCALER'])
+model_marine_sail_decision = load_model(app.config['MODEL_MARINE_SAIL_DECISION'], compile=False)
+
+model_marine_scaler_price = joblib.load(app.config['MODEL_MARINE_SCALER_PRICE'])
+model_marine_scaler_actual_price = joblib.load(app.config['MODEL_MARINE_SCALER_ACTUAL_PRICE'])
 
 bucket_name = 'bangkitcapstone-bloomy-bucket'
 client = storage.Client.from_service_account_json(json_credentials_path=app.config["GOOGLE_APPLICATION_CREDENTIALS"])
@@ -65,15 +71,20 @@ def predict_marine_classification():
             classificationResult = model_marine_classification.predict(x, batch_size=1)
             class_list = ['Ikan', 'Udang']
             classification_class = class_list[np.argmax(classificationResult[0])]
-            classes = model_marine_grading.predict(x, batch_size=1)
-            class_list = ['A', 'B', 'C']
-            predicted_class = class_list[np.argmax(classes[0])]
-            
-            # static/uploads/....
+            predicted_class = None
+            if(classification_class == 'Ikan'):
+                classes = model_marine_grading_fish.predict(x, batch_size=1)
+                class_list = ['A', 'B', 'C']
+                predicted_class = class_list[np.argmax(classes[0])]
+            elif(classification_class == 'Udang'):
+                classes = model_marine_grading_shrimp.predict(x, batch_size=1)
+                class_list = ['A', 'B', 'C']
+                predicted_class = class_list[np.argmax(classes[0])]
+            else:
+                predicted_class = 'Grade tidak tersedia'
             image_name = image_path.split('/')[-1]
             blob = bucket.blob('marine-images/' + image_name)
             blob.upload_from_filename(image_path)
-            
             os.remove(image_path)
             return jsonify({
                 'status': {
@@ -127,7 +138,7 @@ def predict_marine_sail_decision():
 
 def predict_price(data, model):
     prediction = model.predict(data)
-    prediction = model_marine_price_scaler.inverse_transform(prediction)
+    prediction = model_marine_scaler_price.inverse_transform(prediction)
     prediction_float = prediction.item()
     return bulatkan_ke_kelipatan(round(prediction_float, 0),1000)
 
@@ -164,7 +175,7 @@ def predict_marine_price_prediction():
                 }
             }), 200
         else:
-            data_new['Actual Price'] = model_marine_actual_price_scaler.transform(data_new[['Actual Price']])
+            data_new['Actual Price'] = model_marine_scaler_actual_price.transform(data_new[['Actual Price']])
             price = predict_price(data_new, model_marine_price)
             price = bulatkan_ke_kelipatan(price, 1000)
             return jsonify({
