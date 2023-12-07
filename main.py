@@ -16,15 +16,15 @@ app = Flask(__name__)
 app.config['ALLOWED_EXTENSIONS'] = set(['png', 'jpg', 'jpeg'])
 app.config['UPLOAD_FOLDER'] = 'static/uploads/'
 
-app.config['MODEL_MARINE_CLASSIFICATION'] = 'models/marine_classification.h5'
-app.config['MODEL_MARINE_GRADING_FISH'] = 'models/marine_grading_fish.h5'
-app.config['MODEL_MARINE_GRADING_SHRIMP'] = 'models/marine_grading_shrimp.h5'
+app.config['MODEL_MARINE_CLASSIFICATION'] = './models/marine_classification.h5'
+app.config['MODEL_MARINE_GRADING_FISH'] = './models/marine_grading_fish.h5'
+app.config['MODEL_MARINE_GRADING_SHRIMP'] = './models/marine_grading_shrimp.h5'
 
-app.config['MODEL_MARINE_PRICE'] = 'models/marine_price.h5'
-app.config['MODEL_MARINE_SAIL_DECISION'] = 'models/marine_sail_decision.h5'
+app.config['MODEL_MARINE_PRICE'] = './models/marine_price.h5'
+app.config['MODEL_MARINE_SAIL_DECISION'] = './models/marine_sail_decision.h5'
 
-app.config['MODEL_MARINE_SCALER_PRICE'] = 'models/scaler_price.pkl'
-app.config['MODEL_MARINE_SCALER_ACTUAL_PRICE'] = 'models/scaler_actual_price.pkl'
+app.config['MODEL_MARINE_SCALER_PRICE'] = './models/scaler_price.pkl'
+app.config['MODEL_MARINE_SCALER_ACTUAL_PRICE'] = './models/scaler_actual_price.pkl'
 app.config["GOOGLE_APPLICATION_CREDENTIALS"] = './credentials/bangkitcapstone-bloomy-53eae279350a.json'
 
 model_marine_classification = load_model(app.config['MODEL_MARINE_CLASSIFICATION'], compile=False)
