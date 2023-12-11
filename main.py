@@ -14,9 +14,9 @@ from tensorflow.keras.preprocessing import image as tf_image
 from auth import auth
 from zipfile import ZipFile 
 
-gdown.download('https://drive.google.com/uc?id=1XRb8MDcs6DriKdOnFgawC3UzJclgOlPR')
-with ZipFile('./models.zip', 'r') as modelFolder: 
-    modelFolder.extractall()
+# gdown.download('https://drive.google.com/uc?id=1XRb8MDcs6DriKdOnFgawC3UzJclgOlPR')
+# with ZipFile('./models.zip', 'r') as modelFolder: 
+#     modelFolder.extractall()
 
 load_dotenv()
 app = Flask(__name__)
@@ -142,13 +142,13 @@ def predict_marine_sail_decision():
         data_predict = [[outlook, temperature, humidity, wind]]
         data_predict = np.array(data_predict, dtype=float)
         predicted = model_marine_sail_decision.predict(data_predict)
-        result = int(predicted[0][0])
-        desicion = ['Boleh melaut' if result >= 0.6 else 'Tidak boleh melaut']
+        result = float(predicted[0][0])
+        result_class = ['Boleh melaut' if result >= 0.6 else 'Tidak boleh melaut', 1 if result >= 0.6 else 0]
         return jsonify({
             'status': {
                 'code': 200,
                 'message': 'Success predicting',
-                'data': { 'precentage': result, 'decision': desicion }
+                'data': { 'precentage': result, 'decision': result_class[0], 'class_predict': result_class[1]  }
             }
         }), 200
     else:
