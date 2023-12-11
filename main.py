@@ -1,4 +1,6 @@
-import os
+# import os
+import os; os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+import gdown
 import joblib
 import numpy as np
 import pandas as pd
@@ -10,9 +12,15 @@ from werkzeug.utils import secure_filename
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image as tf_image
 from auth import auth
+from zipfile import ZipFile 
+
+gdown.download('https://drive.google.com/uc?id=1XRb8MDcs6DriKdOnFgawC3UzJclgOlPR')
+with ZipFile('./models.zip', 'r') as modelFolder: 
+    modelFolder.extractall()
 
 load_dotenv()
 app = Flask(__name__)
+
 app.config['ALLOWED_EXTENSIONS'] = set(['png', 'jpg', 'jpeg'])
 app.config['UPLOAD_FOLDER'] = 'static/uploads/'
 
@@ -25,7 +33,7 @@ app.config['MODEL_MARINE_SAIL_DECISION'] = './models/marine_sail_decision.h5'
 
 app.config['MODEL_MARINE_SCALER_PRICE'] = './models/scaler_price.pkl'
 app.config['MODEL_MARINE_SCALER_ACTUAL_PRICE'] = './models/scaler_actual_price.pkl'
-app.config["GOOGLE_APPLICATION_CREDENTIALS"] = './credentials/bangkitcapstone-bloomy-53eae279350a.json'
+app.config['GOOGLE_APPLICATION_CREDENTIALS'] = './credentials/bangkitcapstone-bloomy-53eae279350a.json'
 
 model_marine_classification = load_model(app.config['MODEL_MARINE_CLASSIFICATION'], compile=False)
 model_marine_grading_fish = load_model(app.config['MODEL_MARINE_GRADING_FISH'], compile=False)
@@ -38,7 +46,7 @@ model_marine_scaler_price = joblib.load(app.config['MODEL_MARINE_SCALER_PRICE'])
 model_marine_scaler_actual_price = joblib.load(app.config['MODEL_MARINE_SCALER_ACTUAL_PRICE'])
 
 bucket_name = 'bangkitcapstone-bloomy-bucket'
-client = storage.Client.from_service_account_json(json_credentials_path=app.config["GOOGLE_APPLICATION_CREDENTIALS"])
+client = storage.Client.from_service_account_json(json_credentials_path=app.config['GOOGLE_APPLICATION_CREDENTIALS'])
 bucket = storage.Bucket(client, bucket_name)
 
 def allowed_file(filename):
@@ -48,9 +56,24 @@ def allowed_file(filename):
 @app.route('/', methods=['GET'])
 def index():
     return jsonify({
-        'status': {
-            'code': 200,
-            'message': 'Hello API Marine Product!'
+        'Message': 'بِسْمِ ٱللَّٰهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ',
+        'Data': {
+            'Project': 'Capstone Bangkit 2023 Batch 2',
+            'Tema': 'Ocean and Maritime Economy',
+            'Judul': 'Bloomy',
+            'Team': 'CH2-PS086',
+            'Anggota': [
+                { 'BangkitID': 'M128BSY0948', 'Nama': 'Heical Chandra Syahputra', 'Universitas': 'Politeknik Negeri Jakarta' },
+                { 'BangkitID': 'M128BSY1852', 'Nama': 'Andra Rizki Pratama', 'Universitas': 'Politeknik Negeri Jakarta' },
+                { 'BangkitID': 'M015BSY0866', 'Nama': 'Novebri Tito Ramadhani', 'Universitas': 'Universitas Negeri Yogyakarta' },
+                { 'BangkitID': 'C256BSY3481', 'Nama': 'Aditya Bayu Aji', 'Universitas': 'Universitas Muhammadiyah Cirebon' },
+                { 'BangkitID': 'C313BSX3054', 'Nama': 'Asrini Salsabila Putri', 'Universitas': 'Universitas Siliwangi' },
+                { 'BangkitID': 'A258BSY2276', 'Nama': 'Ahmad Tiova Ian Avola', 'Universitas': 'Universitas Muhammadiyah Malang' },
+                { 'BangkitID': 'A128BSY2319', 'Nama': 'Sandhi Karunia Sugihartana', 'Universitas': 'Politeknik Negeri Jakarta' },
+            ],
+            'Moto': 'Cihhh! Jangan meremehkan wibuuu, dasar Ninggen tidak bergunaa! >.< iKuzooo minnaa..',
+            'CreatedBy': 'Aditya Bayu',
+            'Copyright': '©2023 All Rights Reserved!'
         }
     }), 200
 
@@ -63,7 +86,7 @@ def predict_marine_classification():
             filename = secure_filename(reqImage.filename)
             reqImage.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            img = Image.open(image_path).convert("RGB")
+            img = Image.open(image_path).convert('RGB')
             img = img.resize((150, 150))
             x = tf_image.img_to_array(img)
             x = np.expand_dims(x, axis=0)
@@ -186,5 +209,5 @@ def predict_marine_price_prediction():
                 }
             }), 200
 
-if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8000)))
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0', port=int(os.environ.get('PORT', 8000)))
