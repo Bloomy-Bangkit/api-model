@@ -87,20 +87,20 @@ def predict_marine_classification():
             reqImage.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             img = Image.open(image_path).convert('RGB')
-            img = img.resize((150, 150))
+            img = img.resize((160, 160))
             x = tf_image.img_to_array(img)
             x = np.expand_dims(x, axis=0)
             x = x / 255
-            classificationResult = model_marine_classification.predict(x, batch_size=1)
+            classificationResult = model_marine_classification.predict(x, batch_size=1) # MODEL A
             class_list = ['Ikan', 'Udang']
             classification_class = class_list[np.argmax(classificationResult[0])]
             predicted_class = None
             if(classification_class == 'Ikan'):
-                classes = model_marine_grading_fish.predict(x, batch_size=1)
+                classes = model_marine_grading_fish.predict(x, batch_size=1) # MODEL B
                 class_list = ['A', 'B', 'C']
                 predicted_class = class_list[np.argmax(classes[0])]
             elif(classification_class == 'Udang'):
-                classes = model_marine_grading_shrimp.predict(x, batch_size=1)
+                classes = model_marine_grading_shrimp.predict(x, batch_size=1) # MODEL C
                 class_list = ['A', 'B', 'C']
                 predicted_class = class_list[np.argmax(classes[0])]
             else:
