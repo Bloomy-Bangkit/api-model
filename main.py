@@ -14,7 +14,7 @@ from tensorflow.keras.preprocessing import image as tf_image
 from auth import auth
 from zipfile import ZipFile 
 
-gdown.download('https://drive.google.com/uc?1XRb8MDcs6DriKdOnFgawC3UzJclgOlPR')
+gdown.download('https://drive.google.com/uc?id=1Yczy94kJKuywrJzL9PqHtcXHwmnDD6K4')
 with ZipFile('./models.zip', 'r') as modelFolder: 
     modelFolder.extractall()
 
