@@ -14,7 +14,7 @@ from tensorflow.keras.preprocessing import image as tf_image
 from auth import auth
 from zipfile import ZipFile 
 
-gdown.download('https://drive.google.com/uc?1NZBBU8UeTTpgzvuaGRf0yKxUkhYkKj0M')
+gdown.download('https://drive.google.com/uc?1XRb8MDcs6DriKdOnFgawC3UzJclgOlPR')
 with ZipFile('./models.zip', 'r') as modelFolder: 
     modelFolder.extractall()
 
@@ -143,7 +143,7 @@ def predict_marine_sail_decision():
         data_predict = np.array(data_predict, dtype=float)
         predicted = model_marine_sail_decision.predict(data_predict)
         result = float(predicted[0][0])
-        result_class = ['Boleh melaut' if result >= 0.6 else 'Tidak boleh melaut', 1 if result >= 0.6 else 0]
+        result_class = ['Aman Untuk Berlayar' if result >= 0.6 else 'Tidak Aman Untuk Berlayar', 1 if result >= 0.6 else 0]
         return jsonify({
             'status': {
                 'code': 200,
