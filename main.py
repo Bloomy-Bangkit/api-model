@@ -27,10 +27,8 @@ app.config['UPLOAD_FOLDER'] = 'static/uploads/'
 app.config['MODEL_MARINE_CLASSIFICATION'] = './models/marine_classification.h5'
 app.config['MODEL_MARINE_GRADING_FISH'] = './models/marine_grading_fish.h5'
 app.config['MODEL_MARINE_GRADING_SHRIMP'] = './models/marine_grading_shrimp.h5'
-
 app.config['MODEL_MARINE_PRICE'] = './models/marine_price.h5'
 app.config['MODEL_MARINE_SAIL_DECISION'] = './models/marine_sail_decision.h5'
-
 app.config['MODEL_MARINE_SCALER_PRICE'] = './models/scaler_price.pkl'
 app.config['MODEL_MARINE_SCALER_ACTUAL_PRICE'] = './models/scaler_actual_price.pkl'
 app.config['GOOGLE_APPLICATION_CREDENTIALS'] = './credentials/bangkitcapstone-bloomy-53eae279350a.json'
@@ -38,10 +36,8 @@ app.config['GOOGLE_APPLICATION_CREDENTIALS'] = './credentials/bangkitcapstone-bl
 model_marine_classification = load_model(app.config['MODEL_MARINE_CLASSIFICATION'], compile=False)
 model_marine_grading_fish = load_model(app.config['MODEL_MARINE_GRADING_FISH'], compile=False)
 model_marine_grading_shrimp = load_model(app.config['MODEL_MARINE_GRADING_SHRIMP'], compile=False)
-
 model_marine_price = load_model(app.config['MODEL_MARINE_PRICE'], compile=False)
 model_marine_sail_decision = load_model(app.config['MODEL_MARINE_SAIL_DECISION'], compile=False)
-
 model_marine_scaler_price = joblib.load(app.config['MODEL_MARINE_SCALER_PRICE'])
 model_marine_scaler_actual_price = joblib.load(app.config['MODEL_MARINE_SCALER_ACTUAL_PRICE'])
 
