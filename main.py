@@ -1,8 +1,10 @@
 import os; os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import gdown
 import joblib
+import jwt
 import numpy as np
 import pandas as pd
+from functools import wraps
 from http import HTTPStatus
 from PIL import Image
 from flask import Flask, jsonify, request
@@ -12,7 +14,7 @@ from werkzeug.utils import secure_filename
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image as tf_image
 from auth import auth
-from zipfile import ZipFile
+from zipfile import ZipFile 
 
 # gdown.download('https://drive.google.com/uc?id=1Yczy94kJKuywrJzL9PqHtcXHwmnDD6K4')
 # with ZipFile('./models.zip', 'r') as modelFolder: 
@@ -41,17 +43,39 @@ model_marine_sail_decision = load_model(app.config['MODEL_MARINE_SAIL_DECISION']
 model_marine_scaler_price = joblib.load(app.config['MODEL_MARINE_SCALER_PRICE'])
 model_marine_scaler_actual_price = joblib.load(app.config['MODEL_MARINE_SCALER_ACTUAL_PRICE'])
 
-BUCKET_NAME = os.environ.get('BUCKET_NAME')
-if not BUCKET_NAME:
-    raise ValueError("BUCKET_NAME is not set in the environment variables.")
-
+bucket_name = os.environ.get('BUCKET_NAME')
 client = storage.Client.from_service_account_json(json_credentials_path=app.config['GOOGLE_APPLICATION_CREDENTIALS'])
-bucket = storage.Bucket(client, BUCKET_NAME)
+bucket = storage.Bucket(client, bucket_name)
+
+SECRET_KEY = os.environ.get('SECRET_KEY')
+if SECRET_KEY is None:
+    print("SECRET_KEY not found in environment variables.")
 
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1] in app.config['ALLOWED_EXTENSIONS']
            
+def token_required(f):
+    @wraps(f)
+    def decorator(*args, **kwargs):
+        token = request.headers.get('Authorization', None)
+        if not token:
+            return jsonify({'message': 'Invalid token'}), 401
+        try:
+            token_prefix, token_value = token.split()
+            if token_prefix.lower() != 'bearer':
+                raise ValueError('Invalid token prefix')
+            data = jwt.decode(token_value, SECRET_KEY, algorithms=['HS256'])
+            print({'data': data})
+        except jwt.ExpiredSignatureError:
+            return jsonify({'message': 'Token has expired'}), 401
+        except jwt.InvalidTokenError:
+            return jsonify({'message': 'Invalid token'}), 401
+        except ValueError:
+            return jsonify({'message': 'Invalid token format'}), 401
+        return f(data, *args, **kwargs)
+    return decorator
+
 @app.route('/', methods=['GET'])
 def index():
     return jsonify({
@@ -77,8 +101,15 @@ def index():
     }), HTTPStatus.OK
 
 @app.route('/marine/predict', methods=['POST'])
-@auth.login_required()
-def predict_marine_classification():
+@token_required
+def predict_marine_classification(data):
+    if data is None:
+        return jsonify({
+            'status': {
+                'code': HTTPStatus.FORBIDDEN,
+                'message': 'Akses dilarang',
+            }
+        }), HTTPStatus.FORBIDDEN
     if request.method == 'POST':
         reqImage = request.files['image']
         if reqImage and allowed_file(reqImage.filename):
@@ -131,8 +162,15 @@ def predict_marine_classification():
         }), HTTPStatus.METHOD_NOT_ALLOWED
 
 @app.route('/sail_decision/predict', methods=['POST'])
-@auth.login_required()
-def predict_marine_sail_decision():
+@token_required
+def predict_marine_sail_decision(data):
+    if data is None:
+        return jsonify({
+            'status': {
+                'code': HTTPStatus.FORBIDDEN,
+                'message': 'Akses dilarang',
+            }
+        }), HTTPStatus.FORBIDDEN
     if request.method == 'POST':
         outlook = float(request.form['outlook'])
         temperature = float(request.form['temperature'])
@@ -173,8 +211,15 @@ def bulatkan_ke_kelipatan(angka, kelipatan):
         return ke_bawah
 
 @app.route('/price/predict', methods=['POST'])
-@auth.login_required()
-def predict_marine_price_prediction():
+@token_required
+def predict_marine_price_prediction(data):
+    if data is None:
+        return jsonify({
+            'status': {
+                'code': HTTPStatus.FORBIDDEN,
+                'message': 'Akses dilarang',
+            }
+        }), HTTPStatus.FORBIDDEN
     if request.method == 'POST':
         grade = float(request.form['grade'])
         catchingMethod = float(request.form['catchingMethod'])
