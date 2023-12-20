@@ -12,8 +12,8 @@ from werkzeug.utils import secure_filename
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image as tf_image
 from auth import auth
-from zipfile import ZipFile 
-# ImportError: cannot import name 'Mapping' from 'collections' (/usr/local/lib/python3.10/collections/__init__.py)
+from zipfile import ZipFile
+
 gdown.download('https://drive.google.com/uc?id=1Yczy94kJKuywrJzL9PqHtcXHwmnDD6K4')
 with ZipFile('./models.zip', 'r') as modelFolder: 
     modelFolder.extractall()
