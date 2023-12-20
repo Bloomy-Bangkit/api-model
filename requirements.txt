@@ -64,3 +64,4 @@ wrapt==1.16.0
 zipp==3.17.0
 gdown==4.7.1
 PyJWT==1.4.2
+Flask-JWT-Extended
