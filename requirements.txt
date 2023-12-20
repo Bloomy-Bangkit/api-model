@@ -8,6 +8,7 @@ click==8.1.7
 colorama==0.4.6
 flask==3.0.0
 Flask-HTTPAuth==4.8.0
+PyJWT==1.4.2
 flatbuffers==23.5.26
 gast==0.4.0
 google-api-core==2.14.0

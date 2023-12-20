@@ -19,11 +19,11 @@ with ZipFile('./models.zip', 'r') as modelFolder:
     modelFolder.extractall()
 
 load_dotenv()
+
 app = Flask(__name__)
 
 app.config['ALLOWED_EXTENSIONS'] = set(['png', 'jpg', 'jpeg'])
 app.config['UPLOAD_FOLDER'] = 'static/uploads/'
-
 app.config['MODEL_MARINE_CLASSIFICATION'] = './models/marine_classification.h5'
 app.config['MODEL_MARINE_GRADING_FISH'] = './models/marine_grading_fish.h5'
 app.config['MODEL_MARINE_GRADING_SHRIMP'] = './models/marine_grading_shrimp.h5'
@@ -31,7 +31,7 @@ app.config['MODEL_MARINE_PRICE'] = './models/marine_price.h5'
 app.config['MODEL_MARINE_SAIL_DECISION'] = './models/marine_sail_decision.h5'
 app.config['MODEL_MARINE_SCALER_PRICE'] = './models/scaler_price.pkl'
 app.config['MODEL_MARINE_SCALER_ACTUAL_PRICE'] = './models/scaler_actual_price.pkl'
-app.config['GOOGLE_APPLICATION_CREDENTIALS'] = './credentials/bangkitcapstone-bloomy-53eae279350a.json'
+app.config['GOOGLE_APPLICATION_CREDENTIALS'] = './credentials/sa-gcs.json'
 
 model_marine_classification = load_model(app.config['MODEL_MARINE_CLASSIFICATION'], compile=False)
 model_marine_grading_fish = load_model(app.config['MODEL_MARINE_GRADING_FISH'], compile=False)
@@ -41,7 +41,7 @@ model_marine_sail_decision = load_model(app.config['MODEL_MARINE_SAIL_DECISION']
 model_marine_scaler_price = joblib.load(app.config['MODEL_MARINE_SCALER_PRICE'])
 model_marine_scaler_actual_price = joblib.load(app.config['MODEL_MARINE_SCALER_ACTUAL_PRICE'])
 
-bucket_name = 'bangkitcapstone-bloomy-bucket'
+bucket_name = os.environ.get('BUCKET_NAME')
 client = storage.Client.from_service_account_json(json_credentials_path=app.config['GOOGLE_APPLICATION_CREDENTIALS'])
 bucket = storage.Bucket(client, bucket_name)
 
@@ -103,7 +103,7 @@ def predict_marine_classification():
                 predicted_class = 'Grade tidak tersedia'
             image_name = image_path.split('/')[-1]
             blob = bucket.blob('marine-images/' + image_name)
-            blob.upload_from_filename(image_path)
+            blob.upload_from_filename(image_path) 
             os.remove(image_path)
             return jsonify({
                 'status': {

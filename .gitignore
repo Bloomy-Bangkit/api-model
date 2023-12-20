@@ -1,3 +1,5 @@
 .venv
+.env
+credentials/
 models/
 models.zip

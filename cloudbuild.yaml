@@ -18,6 +18,7 @@ steps:
       - '--memory'
       - '2048Mi'
       - '--allow-unauthenticated'
+      - '--set-secrets=BUCKET_NAME=bucket_name:latest,SECRET_KEY=secret_key:latest'
 images:
   - 'gcr.io/$PROJECT_ID/bloomy-model:$COMMIT_SHA'
 logsBucket: 'gs://bangkitcapstone-bloomy-bucket/logs'
