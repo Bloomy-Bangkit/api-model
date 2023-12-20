@@ -34,16 +34,6 @@ def verify_token(token):
             }
         }), HTTPStatus.OK
     except jwt.ExpiredSignatureError:
-        return {
-            "status": {
-                "code": HTTPStatus.UNAUTHORIZED,
-                "message": "Token has expired"
-            }
-        }, HTTPStatus.UNAUTHORIZED
+        return None
     except jwt.InvalidTokenError:
-        return {
-            "status": {
-                "code": HTTPStatus.UNAUTHORIZED,
-                "message": "Invalid token"
-            }
-        }, HTTPStatus.UNAUTHORIZED
+        return None
