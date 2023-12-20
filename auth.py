@@ -3,34 +3,47 @@ import jwt
 from dotenv import load_dotenv
 from flask import jsonify
 from flask_httpauth import HTTPTokenAuth
+from http import HTTPStatus
 
 load_dotenv()
 
 auth = HTTPTokenAuth(scheme="Bearer")
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
+if not SECRET_KEY:
+    raise ValueError("SECRET_KEY is not set in the environment variables.")
+
 @auth.error_handler
 def unauthorized():
     return {
         "status": {
-            "code": 401,
+            "code": HTTPStatus.UNAUTHORIZED,
             "message": "Unauthorized"
         }
-    }, 401
+    }, HTTPStatus.UNAUTHORIZED
 
 @auth.verify_token
 def verify_token(token):
     try:
         result = jwt.decode(token, SECRET_KEY)
-        print('sukses')
         return jsonify({
             'status': {
-                'code': 200,
+                'code': HTTPStatus.OK,
                 'message': 'Berhasil request',
                 'result': result
             }
-        }), 200
+        }), HTTPStatus.OK
     except jwt.ExpiredSignatureError:
-        return None
+        return {
+            "status": {
+                "code": HTTPStatus.UNAUTHORIZED,
+                "message": "Token has expired"
+            }
+        }, HTTPStatus.UNAUTHORIZED
     except jwt.InvalidTokenError:
-        return None
+        return {
+            "status": {
+                "code": HTTPStatus.UNAUTHORIZED,
+                "message": "Invalid token"
+            }
+        }, HTTPStatus.UNAUTHORIZED

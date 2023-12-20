@@ -1,9 +1,9 @@
-# import os
 import os; os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import gdown
 import joblib
 import numpy as np
 import pandas as pd
+from http import HTTPStatus
 from PIL import Image
 from flask import Flask, jsonify, request
 from google.cloud import storage
@@ -12,7 +12,7 @@ from werkzeug.utils import secure_filename
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image as tf_image
 from auth import auth
-from zipfile import ZipFile 
+from zipfile import ZipFile
 
 gdown.download('https://drive.google.com/uc?id=1Yczy94kJKuywrJzL9PqHtcXHwmnDD6K4')
 with ZipFile('./models.zip', 'r') as modelFolder: 
@@ -71,7 +71,7 @@ def index():
             'CreatedBy': 'Aditya Bayu',
             'Copyright': '©2023 All Rights Reserved!'
         }
-    }), 200
+    }), HTTPStatus.OK
 
 @app.route('/marine/predict', methods=['POST'])
 @auth.login_required()
@@ -107,25 +107,25 @@ def predict_marine_classification():
             os.remove(image_path)
             return jsonify({
                 'status': {
-                    'code': 200,
+                    'code': HTTPStatus.OK,
                     'message': 'Success predicting',
                     'data': { 'class': classification_class, 'grade': predicted_class }
                 }
-            }), 200
+            }), HTTPStatus.OK
         else:
             return jsonify({
                 'status': {
-                    'code': 400,
+                    'code': HTTPStatus.BAD_REQUEST,
                     'message': 'Invalid file format. Please upload a JPG, JPEG, or PNG image.'
                 }
-            }), 400
+            }), HTTPStatus.BAD_REQUEST
     else:
         return jsonify({
             'status': {
-                'code': 405,
+                'code': HTTPStatus.METHOD_NOT_ALLOWED,
                 'message': 'Method not allowed'
             }
-        }), 405
+        }), HTTPStatus.METHOD_NOT_ALLOWED
 
 @app.route('/sail_decision/predict', methods=['POST'])
 @auth.login_required()
@@ -142,18 +142,18 @@ def predict_marine_sail_decision():
         result_class = ['Aman Untuk Berlayar' if result >= 0.6 else 'Tidak Aman Untuk Berlayar', 1 if result >= 0.6 else 0]
         return jsonify({
             'status': {
-                'code': 200,
+                'code': HTTPStatus.OK,
                 'message': 'Success predicting',
                 'data': { 'precentage': result, 'decision': result_class[0], 'class_predict': result_class[1]  }
             }
-        }), 200
+        }), HTTPStatus.OK
     else:
         return jsonify({
             'status': {
-                'code': 405,
+                'code': HTTPStatus.METHOD_NOT_ALLOWED,
                 'message': 'Method not allowed'
             }
-        }), 405
+        }), HTTPStatus.METHOD_NOT_ALLOWED
 
 def predict_price(data, model):
     prediction = model.predict(data)
@@ -188,22 +188,22 @@ def predict_marine_price_prediction():
             price = float(result_array[0])
             return jsonify({
                 'status': {
-                    'code': 200,
+                    'code': HTTPStatus.OK,
                     'message': 'Success predicting',
                     'data': { 'price' : int(price) }
                 }
-            }), 200
+            }), HTTPStatus.OK
         else:
             data_new['Actual Price'] = model_marine_scaler_actual_price.transform(data_new[['Actual Price']])
             price = predict_price(data_new, model_marine_price)
             price = bulatkan_ke_kelipatan(price, 1000)
             return jsonify({
                 'status': {
-                    'code': 200,
+                    'code': HTTPStatus.OK,
                     'message': 'Success predicting',
                     'data': { 'price' : int(price) }
                 }
-            }), 200
+            }), HTTPStatus.OK
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=int(os.environ.get('PORT', 8000)))
