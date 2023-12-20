@@ -66,7 +66,6 @@ def token_required(f):
             if token_prefix.lower() != 'bearer':
                 raise ValueError('Invalid token prefix')
             data = jwt.decode(token_value, SECRET_KEY, algorithms=['HS256'])
-            print({'data': data})
         except jwt.ExpiredSignatureError:
             return jsonify({'message': 'Token has expired'}), 401
         except jwt.InvalidTokenError:
