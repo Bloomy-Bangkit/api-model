@@ -7,6 +7,7 @@ RUN apk add --no-cache wget
 RUN mkdir -p /credentials
 RUN wget -O /credentials/sa-gcs.json https://storage.googleapis.com/bangkitcapstone-bloomy-bucket/service-account/sa-gcs.json
 COPY . ./
+RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 EXPOSE 8080
 CMD ["python", "main.py"]
