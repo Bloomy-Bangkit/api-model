@@ -14,9 +14,9 @@ from tensorflow.keras.preprocessing import image as tf_image
 from auth import auth
 from zipfile import ZipFile
 
-gdown.download('https://drive.google.com/uc?id=1Yczy94kJKuywrJzL9PqHtcXHwmnDD6K4')
-with ZipFile('./models.zip', 'r') as modelFolder: 
-    modelFolder.extractall()
+# gdown.download('https://drive.google.com/uc?id=1Yczy94kJKuywrJzL9PqHtcXHwmnDD6K4')
+# with ZipFile('./models.zip', 'r') as modelFolder: 
+#     modelFolder.extractall()
 
 load_dotenv()
 
@@ -41,9 +41,12 @@ model_marine_sail_decision = load_model(app.config['MODEL_MARINE_SAIL_DECISION']
 model_marine_scaler_price = joblib.load(app.config['MODEL_MARINE_SCALER_PRICE'])
 model_marine_scaler_actual_price = joblib.load(app.config['MODEL_MARINE_SCALER_ACTUAL_PRICE'])
 
-bucket_name = os.environ.get('BUCKET_NAME')
+BUCKET_NAME = os.environ.get('BUCKET_NAME')
+if not BUCKET_NAME:
+    raise ValueError("BUCKET_NAME is not set in the environment variables.")
+
 client = storage.Client.from_service_account_json(json_credentials_path=app.config['GOOGLE_APPLICATION_CREDENTIALS'])
-bucket = storage.Bucket(client, bucket_name)
+bucket = storage.Bucket(client, BUCKET_NAME)
 
 def allowed_file(filename):
     return '.' in filename and \
