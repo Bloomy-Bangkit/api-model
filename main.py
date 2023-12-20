@@ -13,7 +13,6 @@ from dotenv import load_dotenv
 from werkzeug.utils import secure_filename
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image as tf_image
-from auth import auth
 from zipfile import ZipFile 
 
 gdown.download('https://drive.google.com/uc?id=1Yczy94kJKuywrJzL9PqHtcXHwmnDD6K4')
