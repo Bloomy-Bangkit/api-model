@@ -15,7 +15,7 @@ from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image as tf_image
 from zipfile import ZipFile 
 
-gdown.download('https://drive.google.com/uc?id=1Yczy94kJKuywrJzL9PqHtcXHwmnDD6K4')
+gdown.download('https://drive.google.com/uc?id=1LSjqv4GteWiC7dSTY_2e1TggvglgeXR4')
 with ZipFile('./models.zip', 'r') as modelFolder: 
     modelFolder.extractall()
 
@@ -252,4 +252,4 @@ def predict_marine_price_prediction(data):
             }), HTTPStatus.OK
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=int(os.environ.get('PORT', 8000)))
+    app.run(debug=True, host='0.0.0.0', port=int(os.environ.get('PORT', 5001)))

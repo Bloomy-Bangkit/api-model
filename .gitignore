@@ -2,5 +2,5 @@ __pycache__
 .venv
 .env
 models/
-models.zip
+# models.zip
 auth.py
